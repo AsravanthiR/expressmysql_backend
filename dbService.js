@@ -1,12 +1,8 @@
-import 'dotenv';
+import 'dotenv/config.js';
 import pkg from 'pg';
 const { Pool } = pkg;
 const pool = new Pool({
-  host: process.env.HOST,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DB_CONNECTIONSTRING,
 });
 
 // get all users
@@ -23,12 +19,16 @@ export const getAllData = (request, response) => {
 export const searchByName = (request, response) => {
   const id = parseInt(request.params.id);
 
-  pool.query('SELECT * FROM names WHERE name = ?', [id], (error, results) => {
-    if (error) {
-      throw error;
+  pool.query(
+    'SELECT * FROM names WHERE username = ?',
+    [id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json(results.rows);
     }
-    response.status(200).json(results.rows);
-  });
+  );
 };
 
 // post a new user
@@ -37,7 +37,7 @@ export const insertNewName = (request, response) => {
   const dateAdded = new Date();
 
   pool.query(
-    'INSERT INTO names (name, date_added) VALUES (?,?)',
+    'INSERT INTO names (username, date_added) VALUES (?,?)',
     [name, dateAdded],
     (error, results) => {
       if (error) {
@@ -55,7 +55,7 @@ export const updateNameById = (request, response) => {
   const name = request.body;
 
   pool.query(
-    'UPDATE names SET name = ? WHERE id = ?',
+    'UPDATE names SET username = ? WHERE id = ?',
     [name, id],
     (error, results) => {
       if (error) {

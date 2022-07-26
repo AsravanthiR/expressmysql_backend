@@ -25,7 +25,7 @@ app.use(
 // });
 
 app.get('/getAll', getAllData);
-app.get('/search/:name', searchByName);
+app.get('/search/:username', searchByName);
 app.post('/insert', insertNewName);
 app.put('/update', updateNameById);
 app.delete('/delete/:id', deleteRowById);
