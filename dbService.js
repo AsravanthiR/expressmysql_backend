@@ -11,39 +11,40 @@ export const getAllData = (request, response) => {
     if (error) {
       throw error;
     }
-    response.status(200).json(results.rows);
+    response.status(200).json({ data: results.rows });
   });
 };
 
-// get user by id
+// get user by name
 export const searchByName = (request, response) => {
-  const id = parseInt(request.params.id);
+  //const id = parseInt(request.params.id);
+  const name = request.params.username;
 
   pool.query(
-    'SELECT * FROM names WHERE username = ?',
-    [id],
+    'SELECT * FROM names WHERE username = $1',
+    [name],
     (error, results) => {
       if (error) {
         throw error;
       }
-      response.status(200).json(results.rows);
+      response.status(200).json({ data: results.rows });
     }
   );
 };
 
 // post a new user
 export const insertNewName = (request, response) => {
-  const name = request.body;
+  const { name } = request.body;
   const dateAdded = new Date();
 
   pool.query(
-    'INSERT INTO names (username, date_added) VALUES (?,?)',
+    'INSERT INTO names (username, date_added) VALUES ($1,$2)',
     [name, dateAdded],
     (error, results) => {
       if (error) {
         throw error;
       }
-      response.status(201).send(`User added with ID: ${results.rows[0].id}`);
+      response.status(201).json({ data: results.rows });
     }
   );
 };
@@ -52,16 +53,16 @@ export const insertNewName = (request, response) => {
 
 export const updateNameById = (request, response) => {
   const id = parseInt(request.params.id);
-  const name = request.body;
+  const { name } = request.body;
 
   pool.query(
-    'UPDATE names SET username = ? WHERE id = ?',
+    'UPDATE names SET username = $1 WHERE id = $2',
     [name, id],
     (error, results) => {
       if (error) {
         throw error;
       }
-      response.status(200).send(`User modified with ID: ${id}`);
+      response.status(200).json({ data: results.rows });
     }
   );
 };
@@ -70,10 +71,10 @@ export const updateNameById = (request, response) => {
 export const deleteRowById = (request, response) => {
   const id = parseInt(request.params.id);
 
-  pool.query('DELETE FROM names WHERE id = ?', [id], (error, results) => {
+  pool.query('DELETE FROM names WHERE id = $1', [id], (error, results) => {
     if (error) {
       throw error;
     }
-    response.status(200).send(`User deleted with ID: ${id}`);
+    response.status(200).json(`User deleted`);
   });
 };
